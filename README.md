@@ -19,7 +19,7 @@
 ---
 
 ## 🏗️ 2. 개발 철학 및 코드 컨벤션
-> 4인 멀티플레이와 물리 기반 상호작용의 안정성을 확보하기 위해, 개인의 코딩 스타일을 배제하고 엄격한 실무 기준의 공통 개발 컨벤션을 수립하여 개발했습니다.
+> 4인 멀티플레이와 물리 기반 상호작용의 안정성을 확보하기 위해, 엄격한 실무 기준의 공통 개발 컨벤션을 수립하여 개발했습니다.
 
 ### 🎯 핵심 설계 사상 (C++ ↔ Blueprint 역할 분리)
 1. **"가독성은 축약보다 우선한다."**
@@ -29,9 +29,9 @@
 3. **"한 클래스(혹은 BP)는 하나의 책임만 가진다."**
 
 ### 💻 Naming & Code Style
-*   **타입 접두사:** `A`(Actor), `U`(UObject/Component), `F`(Struct), `E`(Enum), `I`(Interface) 등 Unreal 엔진 표준 명명 규칙(PascalCase)을 엄수했습니다.
-*   **네트워크 동기화 (RPC):** `Server_` (규칙 처리), `Multicast_` (연출 동기화), `Client_` (개인 UI/피드백) 접두사로 구분하여 멀티플레이 권한과 역할을 명시했습니다.
-*   **변수/함수:** 멤버 변수는 `camelCase`, `bool` 변수는 `bIs`/`bCan` 접두사 필수 사용. 함수명은 `동사+목적어` 형태로 작성하여 이름만으로 동작이 유추되도록 강제했습니다.
+*   **언리얼 엔진 표준 준수:** 멤버 변수와 함수명 등 모든 네이밍은 언리얼 엔진 공식 코딩 표준인 `PascalCase`를 엄격히 따랐습니다.
+*   **타입 및 상태 명시:** `A`(Actor), `U`(UObject/Component), `F`(Struct), `E`(Enum), `I`(Interface) 등의 타입 접두사와, `bool` 변수의 `bIs`/`bCan` 접두사를 일관되게 사용하여 가독성을 높였습니다.
+*   **네트워크 동기화 (RPC):** `Server`, `Multicast`, `Client` 등의 키워드를 함수명에 명시하여 멀티플레이 환경에서의 권한과 역할을 직관적으로 파악할 수 있도록 설계했습니다.
 
 ### 📁 디렉토리 구조 및 협업 컨벤션
 *   **Asset:** `Content/` 하위에 `Characters`, `Physics`, `Stage`, `UI`, `FX` 등으로 모듈화하였으며, `SM_`, `SK_`, `M_`, `NS_` 등 명확한 에셋 접두사를 사용했습니다.
@@ -45,25 +45,24 @@
 ### ⚔️ [1] 데이터 주도형(Data-Driven) 스킬 시스템 및 캐릭터 아키텍처
 *   **내용:** `BaseCharacter` 내에 공통 로직을 집중하고, 애니메이션 몽타주, 투사체, 쿨타임 등을 하드코딩 없이 `FSkillData` 구조체로 캡슐화하여 DataTable과 연동.
 *   **성과:** 프로그래머의 개입(리컴파일) 없이 기획자가 에디터에서 즉각적인 밸런싱 및 리소스 교체가 가능한 협업 최적화 환경 구축.
-*   🔗 **[BaseCharacter.h 및 관련 코드 확인하기 (경로 삽입)](#)**
+*   🔗 **[BaseCharacter.h 및 관련 코드 확인하기](Source/Project_Bang_Squad/Character/Base/BaseCharacter.h)**
 
 ### 🌐 [2] 멀티플레이 조작감 최적화 (Zero Input Lag)
 *   **내용:** 서버 멀티캐스트 응답을 기다리지 않고 로컬에서 즉각 애니메이션을 선행 재생(`PlayActionMontage`)하는 로컬 예측 적용 및 `IsLocallyControlled()`를 통한 이중 재생 방지.
 *   **성과:** 조작 지연을 제거하고 송수신 대역폭을 초당 3.5KB 수준으로 안정적으로 방어.
-*   🔗 **[BaseCharacter.cpp 네트워크 로직 확인하기 (경로 삽입)](#)**
+*   🔗 **[BaseCharacter.cpp 네트워크 로직 확인하기](Source/Project_Bang_Squad/Character/Base/BaseCharacter.cpp)**
 
 ### 🛡️ [3] 팔라딘(Paladin): 정밀 근접 판정 및 지향성 방어 (Server Authority)
 *   **내용:** 
     *   0.015초 주기의 박스형 레이캐스트(`SweepMultiByChannel`)를 통한 고스트 스윙(Ghost Swing) 방지.
     *   캐릭터 시선 벡터와 공격 방향 벡터의 내적(Dot Product)을 서버 내부에서만 계산하여 핑(Ping) 조작이나 클라이언트 변조를 원천 차단.
-*   🔗 **[PaladinCharacter.cpp 확인하기 (경로 삽입)](#)**
+*   🔗 **[PaladinCharacter.cpp 확인하기](Source/Project_Bang_Squad/Character/PaladinCharacter.cpp)**
 
 ### 🧙 [4] 메이지(Mage): 인터페이스 다형성 및 표면 수학 연산
 *   **내용:**
     *   염력 액터들을 `IMagicInteractableInterface`로 추상화하여 결합도를 낮춤.
     *   스킬 적중 시 레이캐스트의 노멀 벡터(`ImpactNormal`)를 추출하여 경사로에 완벽히 밀착되는 3D 회전 매트릭스 구현.
-*   🔗 **[MageCharacter.cpp 확인하기 (경로 삽입)](#)**
-
+*   🔗 **[MageCharacter.cpp 확인하기](Source/Project_Bang_Squad/Character/MageCharacter.cpp)**
 
 ---
 

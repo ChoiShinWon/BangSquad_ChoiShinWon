@@ -1,11 +1,9 @@
 # 🛡️ Project: BANG-SQUAD
 
-![메인 전투 연출 및 UI](./Images/BangSquad_Combat.gif)
-![멀티플레이어 기믹 상호작용](./Images/BangSquad_Multiplay.gif)
 
 > "Unreal Engine 5 기반 4인 협동 3D 멀티플레이 액션 RPG 팀 프로젝트입니다.  
 > 본 README는 팀 전체 소개가 아니라 **개인 기여 포트폴리오 목적**의 문서입니다."
-> ## Note: 본 프로젝트는 현재 배포 및 라이브 서비스 단계가 아니므로 실행 파일 배포는 제공하지 않습니다.
+> Note: 본 프로젝트는 현재 배포 및 라이브 서비스 단계가 아니므로 실행 파일 배포는 제공하지 않습니다.
 
 ---
 
